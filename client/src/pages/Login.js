@@ -14,7 +14,6 @@ const Login = () => {
     const onFinishHandler = async (values) => {
         try {
             dispatch(showLoading())
-            // 1️⃣ Login request
             const res = await axios.post("/api/v1/user/login", values)
             dispatch(hideLoading())
 
@@ -22,7 +21,6 @@ const Login = () => {
                 message.success('Login Successfully!')
                 localStorage.setItem("token", res.data.token)
 
-                // 2️⃣ Fetch user data using the token
                 const userRes = await axios.post(
                     "/api/v1/user/getUserData",
                     {},
@@ -34,9 +32,7 @@ const Login = () => {
                 )
 
                 if (userRes.data.success) {
-                    // 3️⃣ Save user data in Redux
                     dispatch(setUser(userRes.data.data))
-                    // 4️⃣ Navigate to home page
                     navigate("/")
                 } else {
                     message.error("Failed to fetch user data")
