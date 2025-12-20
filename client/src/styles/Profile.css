@@ -1,0 +1,89 @@
+/* Profile Page Styles */
+.profile-header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.profile-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #DC143C 0%, #B71C1C 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+}
+
+.profile-card {
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(220, 20, 60, 0.1);
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.profile-card-head {
+    background: linear-gradient(135deg, #DC143C 0%, #B71C1C 100%);
+    color: white;
+    padding: 20px 24px;
+    border-bottom: none;
+}
+
+.profile-edit-btn {
+    border-radius: 10px;
+    font-weight: 600;
+    height: 42px;
+    padding: 0 24px;
+    transition: all 0.3s ease;
+}
+
+.profile-edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+}
+
+.profile-descriptions {
+    padding: 24px;
+}
+
+.profile-descriptions .ant-descriptions-item-label {
+    font-weight: 600;
+    color: #DC143C;
+    font-size: 1rem;
+}
+
+.profile-descriptions .ant-descriptions-item-content {
+    color: #212529;
+    font-size: 1rem;
+}
+
+.profile-form {
+    padding: 24px;
+}
+
+.profile-form .ant-input,
+.profile-form .ant-input-password {
+    border-radius: 8px;
+    border: 2px solid #E0E0E0;
+    padding: 10px 16px;
+    transition: all 0.3s ease;
+}
+
+.profile-form .ant-input:focus,
+.profile-form .ant-input-password:focus {
+    border-color: #DC143C;
+    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

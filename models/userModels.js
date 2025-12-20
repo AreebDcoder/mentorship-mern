@@ -1,34 +1,57 @@
-const mongoose = require('mongoose')
-const MongoSchema = new mongoose.Schema({
+const mongoose = require("mongoose");
+
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Name is required']
+        required: [true, "name is require"],
     },
     email: {
         type: String,
-        required: [true, 'Email is required']
+        required: [true, "email is require"],
+        unique: true,
     },
     password: {
         type: String,
-        required: [true, 'Password is required']
+        required: [true, "password is require"],
     },
-    isDoctor: {
-        type: Boolean,
-        default: false
-
+    role: {
+        type: String,
+        enum: ["mentor", "mentee", "admin"],
+        default: "mentee",
     },
     isAdmin: {
         type: Boolean,
-        default: false
+        default: false,
     },
-    notification: {
+    isMentor: {
+        type: Boolean,
+        default: false,
+    },
+    mentorStatus: {
+        type: String,
+        enum: ["pending", "approved", "rejected"],
+    },
+    profile: {
+        phone: String,
+        address: String,
+        bio: String,
+        linkedin: String,
+        github: String,
+        graduationYear: String,
+        currentPosition: String,
+        company: String,
+        profilePicture: String, // Base64 encoded image or URL
+    },
+    notifcation: {
         type: Array,
-        default: []
+        default: [],
     },
     seennotification: {
         type: Array,
-        default: []
-    }
-})
-const userModel = mongoose.model("users", MongoSchema)
+        default: [],
+    },
+}, { timestamps: true });
+
+const userModel = mongoose.model("users", userSchema);
+
 module.exports = userModel;

@@ -1,18 +1,83 @@
-const express = require('express');
-const { loginController, registerController, authController, applyDoctorController, getAllNotificationController } = require('../controller/userCtrl');
-const authMiddleware = require('../middlewares/authMiddleware');
+const express = require("express");
+const {
+    loginController,
+    registerController,
+    authController,
+    applyMentorController,
+    getAllMentorsController,
+    getMentorProfileController,
+    getAllNotificationController,
+    deleteAllNotificationController,
+    createSessionController,
+    updateSessionController,
+    getSessionsController,
+    deleteSessionController,
+    sendMessageController,
+    getMessagesController,
+    getConversationsController,
+    createOpportunityController,
+    getOpportunitiesController,
+    deleteOpportunityController,
+    submitRatingController,
+    updateProfileController,
+} = require("../controllers/userCtrl");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-const route = express.Router();
+//router object
+const router = express.Router();
 
-//login router
-route.post('/login', loginController)
-//register router
-route.post('/register', registerController)
-//auth
-route.post('/getUserData', authMiddleware, authController)
-//apply-doc
-route.post('/apply-doctor', authMiddleware, applyDoctorController)
-//
-route.post('/get-all-notification', authMiddleware, getAllNotificationController)
+//routes
+//LOGIN || POST
+router.post("/login", loginController);
 
-module.exports = route;
+//REGISTER || POST
+router.post("/register", registerController);
+
+//Auth || POST
+router.post("/getUserData", authMiddleware, authController);
+
+//Apply Mentor || POST
+router.post("/apply-mentor", authMiddleware, applyMentorController);
+
+//Get All Mentors || GET
+router.get("/mentors", getAllMentorsController);
+
+//Get Mentor Profile || GET
+router.get("/mentor/:id", getMentorProfileController);
+
+//Notification || POST
+router.post(
+    "/get-all-notification",
+    authMiddleware,
+    getAllNotificationController
+);
+router.post(
+    "/delete-all-notification",
+    authMiddleware,
+    deleteAllNotificationController
+);
+
+//Sessions || POST/GET
+router.post("/sessions", authMiddleware, createSessionController);
+router.put("/sessions", authMiddleware, updateSessionController);
+router.post("/get-sessions", authMiddleware, getSessionsController);
+// DELETE route for deleting rejected sessions
+router.delete('/sessions/:sessionId', authMiddleware, deleteSessionController);
+
+//Messages || POST/GET
+router.post("/messages", authMiddleware, sendMessageController);
+router.get("/messages/:id", authMiddleware, getMessagesController);
+router.get("/conversations", authMiddleware, getConversationsController);
+
+//Opportunities || POST/GET
+router.post("/opportunities", authMiddleware, createOpportunityController);
+router.get("/opportunities", getOpportunitiesController);
+router.delete('/opportunities/:opportunityId', authMiddleware, deleteOpportunityController);
+
+//Ratings || POST
+router.post("/ratings", authMiddleware, submitRatingController);
+
+//Update Profile || PUT
+router.put("/update-profile", authMiddleware, updateProfileController);
+
+module.exports = router;

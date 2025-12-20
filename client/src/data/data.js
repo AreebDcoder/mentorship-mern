@@ -1,41 +1,84 @@
-export const userMenu = [
+export const menteeMenu = [
     {
         name: 'Home',
         path: '/',
         icon: 'fa-solid fa-house'
     },
     {
-        name: 'Appointments',
-        path: '/appointments',
-        icon: 'fa-solid fa-list'
+        name: 'Find Mentors',
+        path: '/mentors',
+        icon: 'fa-solid fa-user-tie'
     },
     {
-        name: 'Apply Doctor',
-        path: '/apply-doctor',
-        icon: 'fa-solid fa-user-doctor'
+        name: 'My Sessions',
+        path: '/sessions',
+        icon: 'fa-solid fa-calendar-check'
+    },
+    {
+        name: 'Messages',
+        path: '/messages',
+        icon: 'fa-solid fa-message'
+    },
+    {
+        name: 'Opportunities',
+        path: '/opportunities',
+        icon: 'fa-solid fa-briefcase'
     },
     {
         name: 'Profile',
         path: '/profile',
         icon: 'fa-solid fa-user'
     },
-
 ]
-export const adminMenu = [
+
+export const mentorMenu = [
     {
         name: 'Home',
         path: '/',
         icon: 'fa-solid fa-house'
     },
     {
-        name: 'Doctors',
-        path: '/doctors',
-        icon: 'fa-solid fa-user-doctor'
+        name: 'My Sessions',
+        path: '/sessions',
+        icon: 'fa-solid fa-calendar-check'
+    },
+    {
+        name: 'Messages',
+        path: '/messages',
+        icon: 'fa-solid fa-message'
+    },
+    {
+        name: 'Post Opportunity',
+        path: '/post-opportunity',
+        icon: 'fa-solid fa-briefcase'
+    },
+    {
+        name: 'All Opportunities',
+        path: '/opportunities',
+        icon: 'fa-solid fa-briefcase'
+    },
+    {
+        name: 'Profile',
+        path: '/profile',
+        icon: 'fa-solid fa-user'
+    },
+]
+
+export const adminMenu = [
+    {
+        name: 'Dashboard',
+        path: '/admin/dashboard',
+        icon: 'fa-solid fa-chart-line'
+    },
+    {
+        name: 'Mentors',
+        path: '/admin/mentors',
+        icon: 'fa-solid fa-user-tie'
     },
     {
         name: 'Users',
-        path: '/users',
-        icon: 'fa-solid fa-user'
+        path: '/admin/users',
+        icon: 'fa-solid fa-users'
     },
     {
         name: 'Profile',

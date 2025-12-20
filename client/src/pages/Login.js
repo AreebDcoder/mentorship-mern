@@ -15,7 +15,7 @@ const Login = () => {
         try {
             dispatch(showLoading())
             // 1️⃣ Login request
-            const res = await axios.post("http://localhost:8080/api/v1/user/login", values)
+            const res = await axios.post("/api/v1/user/login", values)
             dispatch(hideLoading())
 
             if (res.data.success) {
@@ -24,7 +24,7 @@ const Login = () => {
 
                 // 2️⃣ Fetch user data using the token
                 const userRes = await axios.post(
-                    "http://localhost:8080/api/v1/user/getUserData",
+                    "/api/v1/user/getUserData",
                     {},
                     {
                         headers: {
@@ -58,15 +58,17 @@ const Login = () => {
                 onFinish={onFinishHandler}
                 className='register-form'
             >
-                <h3 className='text-center'>Login Form</h3>
+                <h3 className='text-center'>SkillConnect Login</h3>
                 <Form.Item label='Email' name='email'>
                     <Input type='email' required />
                 </Form.Item>
                 <Form.Item label='Password' name='password'>
                     <Input type='password' required />
                 </Form.Item>
-                <Link to='/register'>Not a user? Register here!</Link>
                 <button className='btn btn-primary' type='submit'>Login</button>
+                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                    <Link to='/register'>Not a user? Register here!</Link>
+                </div>
             </Form>
         </div>
     )

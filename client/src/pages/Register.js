@@ -1,4 +1,4 @@
-import { Form, Input, message } from 'antd'
+import { Form, Input, message, Radio } from 'antd'
 import '../styles/RegisterForm.css'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -11,7 +11,7 @@ const Register = () => {
     const onFinishHandler = async (values) => {
         try {
             dispatch(showLoading())
-            const res = await axios.post("http://localhost:8080/api/v1/user/register", values)
+            const res = await axios.post("/api/v1/user/register", values)
             dispatch(hideLoading())
 
             if (res.data.success) {
@@ -24,7 +24,7 @@ const Register = () => {
         } catch (error) {
             dispatch(hideLoading())
             console.log(error)
-            message.error('Something went wrong');
+            message.error(error.response?.data?.message || 'Something went wrong');
 
         }
     }
@@ -32,18 +32,26 @@ const Register = () => {
         <>
             <div className='container-form'>
                 <Form layout='vertical' onFinish={onFinishHandler} className='register-form'>
-                    <h3 className='text-center'>Registration Form</h3>
-                    <Form.Item label='Name' name='name'>
+                    <h3 className='text-center'>SkillConnect Registration</h3>
+                    <Form.Item label='Name' name='name' rules={[{ required: true }]}>
                         <Input type='text' required />
                     </Form.Item>
-                    <Form.Item label='Email' name='email'>
+                    <Form.Item label='Email' name='email' rules={[{ required: true, type: 'email' }]}>
                         <Input type='email' required />
                     </Form.Item>
-                    <Form.Item label='Password' name='password'>
+                    <Form.Item label='Password' name='password' rules={[{ required: true, min: 6 }]}>
                         <Input type='password' required />
                     </Form.Item>
-                    <Link to='/login'>already a user? login here!</Link >
+                    <Form.Item label='I want to register as' name='role' rules={[{ required: true }]}>
+                        <Radio.Group>
+                            <Radio value="mentee">Mentee (Student)</Radio>
+                            <Radio value="mentor">Mentor (Alumni)</Radio>
+                        </Radio.Group>
+                    </Form.Item>
                     <button className='btn btn-primary' type='submit'>Register</button>
+                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                        <Link to='/login'>Already a user? Login here!</Link>
+                    </div>
                 </Form>
             </div>
         </>

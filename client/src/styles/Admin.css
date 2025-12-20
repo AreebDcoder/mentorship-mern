@@ -1,0 +1,57 @@
+/* Admin Pages Styles */
+.admin-page-header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.admin-page-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #DC143C 0%, #B71C1C 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+}
+
+.admin-page-subtitle {
+    color: #6C757D;
+    font-size: 1.1rem;
+}
+
+.admin-table {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(220, 20, 60, 0.1);
+}
+
+.admin-action-btn {
+    margin: 0 5px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    height: 32px;
+    padding: 0 16px;
+}
+
+.admin-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+}
+
+.refresh-btn {
+    border-radius: 10px;
+    font-weight: 600;
+    height: 42px;
+    padding: 0 24px;
+    transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+}
+

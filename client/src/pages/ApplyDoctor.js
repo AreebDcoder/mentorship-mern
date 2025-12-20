@@ -1,111 +1,134 @@
 import React from 'react'
 import Layout from './../components/Layout'
-import { Form, Input, Col, Row, TimePicker, message } from 'antd'
+import { Form, Input, Col, Row, message } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { showLoading, hideLoading } from '../redux/features/alertSlice'
 import axios from 'axios'
-const ApplyDoctor = () => {
+
+const { TextArea } = Input
+
+const ApplyMentor = () => {
     const { user } = useSelector(state => state.user)
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    
     const handleFinish = async (values) => {
         try {
             dispatch(showLoading())
-            const res = await axios.post("api/v1/user/apply-doctor",
-                { ...values, userId: user._id },
+            
+            // Format availability if provided
+            let availability = {}
+            if (values.availability) {
+                availability = values.availability
+            }
+            
+            const payload = {
+                skills: values.skills ? values.skills.split(',').map(s => s.trim()) : [],
+                experience: values.experience,
+                availability: availability,
+                bio: values.bio,
+                linkedin: values.linkedin,
+                github: values.github,
+                company: values.company,
+                currentPosition: values.currentPosition,
+                graduationYear: values.graduationYear,
+                profile: {
+                    phone: values.phone,
+                    address: values.address,
+                },
+                userId: user._id
+            }
+            
+            const res = await axios.post("/api/v1/user/apply-mentor",
+                payload,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                 }
             )
-            dispatch.hideLoading();
+            dispatch(hideLoading());
             if (res.data.success) {
-                message.success(res.data.success)
+                message.success(res.data.message)
                 navigate("/")
             }
             else {
-                message.error(res.data.success)
+                message.error(res.data.message || "Failed to apply")
             }
         } catch (error) {
             dispatch(hideLoading())
             console.log(error)
-            message.error("Something went wrong")
-
+            const errorMessage = error.response?.data?.message || error.message || "Something went wrong"
+            message.error(errorMessage)
         }
-
-
     }
     return (
         <Layout>
-            <h1 className='text-center'>Apply Doctor</h1>
+            <h1 className='text-center'>Apply to Become a Mentor</h1>
             <Form layout='vertical' onFinish={handleFinish} className='m-3'>
-                <h4>Personal Details</h4>
+                <h4>Contact Information</h4>
                 <Row gutter={20}>
-
                     <Col xs={24} md={24} lg={8}>
-                        <Form.Item label='First Name' name='firstName' required rules={[{ required: true }]}>
-                            <Input type='text' placeholder='Your first name' />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} md={24} lg={8}>
-                        <Form.Item label='Last Name' name='lastName' required rules={[{ required: true }]}>
-                            <Input type='text' placeholder='Your last name' />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} md={24} lg={8}>
-                        <Form.Item label='Phone' name='phone' required rules={[{ required: true }]}>
+                        <Form.Item label='Phone' name='phone' rules={[{ required: true }]}>
                             <Input type='text' placeholder='Phone number' />
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={24} lg={8}>
-                        <Form.Item label='Email' name='email' required rules={[{ required: true }]}>
-                            <Input type='text' placeholder='Your email' />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} md={24} lg={8}>
-                        <Form.Item label='Website' name='website' >
-                            <Input type='text' placeholder='Website link' />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} md={24} lg={8}>
-                        <Form.Item label='Address' name='address' required rules={[{ required: true }]}>
+                        <Form.Item label='Address' name='address'>
                             <Input type='text' placeholder='Your address' />
                         </Form.Item>
                     </Col>
+                    <Col xs={24} md={24} lg={8}>
+                        <Form.Item label='LinkedIn' name='linkedin'>
+                            <Input type='text' placeholder='LinkedIn profile URL' />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={24} lg={8}>
+                        <Form.Item label='GitHub' name='github'>
+                            <Input type='text' placeholder='GitHub profile URL' />
+                        </Form.Item>
+                    </Col>
                 </Row>
-                <h4>Personal Details</h4>
+                <h4>Professional Details</h4>
                 <Row gutter={20}>
-
-                    <Col xs={24} md={24} lg={8}>
-                        <Form.Item label='Specilization' name='specilization' required rules={[{ required: true }]}>
-                            <Input type='text' placeholder='Mention Specilization' />
+                    <Col xs={24} md={24} lg={12}>
+                        <Form.Item label='Skills (comma-separated)' name='skills' rules={[{ required: true }]}>
+                            <Input placeholder='e.g., JavaScript, React, Node.js, Python' />
                         </Form.Item>
                     </Col>
-                    <Col xs={24} md={24} lg={8}>
-                        <Form.Item label='Experience' name='experience' required rules={[{ required: true }]}>
-                            <Input type='text' placeholder='Your Experience' />
+                    <Col xs={24} md={24} lg={12}>
+                        <Form.Item label='Experience' name='experience' rules={[{ required: true }]}>
+                            <Input placeholder='e.g., 5 years in Software Development' />
                         </Form.Item>
                     </Col>
-                    <Col xs={24} md={24} lg={8}>
-                        <Form.Item label='Timings' name='timings' required rules={[{ required: true }]}>
-                            <TimePicker.RangePicker format="HH:mm" />
+                    <Col xs={24} md={24} lg={12}>
+                        <Form.Item label='Current Position' name='currentPosition'>
+                            <Input placeholder='e.g., Senior Software Engineer' />
                         </Form.Item>
                     </Col>
-
-                    <Col xs={24} md={24} lg={8}></Col>
-                    <Col xs={24} md={24} lg={8}><button className='btn btn-primary form-btn' type='submit'>Submit</button></Col>
-
+                    <Col xs={24} md={24} lg={12}>
+                        <Form.Item label='Company' name='company'>
+                            <Input placeholder='Current company name' />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={24} lg={12}>
+                        <Form.Item label='Graduation Year' name='graduationYear'>
+                            <Input placeholder='e.g., 2020' />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={24} lg={24}>
+                        <Form.Item label='Bio' name='bio'>
+                            <TextArea rows={4} placeholder='Tell us about yourself and your expertise...' />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={24} lg={24}>
+                        <button className='btn btn-primary form-btn' type='submit'>Submit Application</button>
+                    </Col>
                 </Row>
-                <div className='d-flex justify-content-end'>
-
-                </div>
-
             </Form>
-
         </Layout>
     )
 }
 
-export default ApplyDoctor
+export default ApplyMentor

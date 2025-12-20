@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
@@ -8,10 +8,10 @@ import { setUser } from "../redux/features/userSlice";
 export default function ProtectedRoute({ children }) {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.user);
+    const [shouldRedirect, setShouldRedirect] = useState(false);
 
     //get user
-    //eslint-disable-next-line
-    const getUser = async () => {
+    const getUser = useCallback(async () => {
         try {
             dispatch(showLoading());
             const res = await axios.post(
@@ -28,24 +28,29 @@ export default function ProtectedRoute({ children }) {
                 dispatch(setUser(res.data.data));
             } else {
                 localStorage.clear();
-                <Navigate to="/login" />;
+                setShouldRedirect(true);
             }
         } catch (error) {
             localStorage.clear();
             dispatch(hideLoading());
+            setShouldRedirect(true);
             console.log(error);
         }
-    };
+    }, [dispatch]);
 
     useEffect(() => {
-        if (!user) {
+        if (!user && localStorage.getItem("token")) {
             getUser();
         }
     }, [user, getUser]);
 
-    if (localStorage.getItem("token")) {
-        return children;
-    } else {
+    if (shouldRedirect || !localStorage.getItem("token")) {
         return <Navigate to="/login" />;
     }
+
+    if (!user && localStorage.getItem("token")) {
+        return null; // or a loading spinner
+    }
+
+    return children;
 }

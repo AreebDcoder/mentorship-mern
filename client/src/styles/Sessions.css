@@ -1,0 +1,60 @@
+/* Sessions Page Styles */
+.sessions-header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.sessions-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #DC143C 0%, #B71C1C 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: '10px';
+}
+
+.sessions-subtitle {
+    color: #6C757D;
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+.session-table {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(220, 20, 60, 0.1);
+}
+
+.session-action-btn {
+    margin: 0 5px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.session-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+}
+
+.join-meeting-link {
+    color: #DC143C;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(220, 20, 60, 0.1);
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.join-meeting-link:hover {
+    background: rgba(220, 20, 60, 0.2);
+    transform: translateY(-2px);
+    color: #B71C1C;
+}
+
