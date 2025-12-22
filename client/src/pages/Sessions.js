@@ -4,7 +4,14 @@ import { Table, Tag, Button, Modal, Input, message } from 'antd'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
 import '../styles/Sessions.css'
-// Using Date formatting instead of dayjs
+
+const STATUS_COLORS = {
+    pending: 'orange',
+    accepted: 'green',
+    rejected: 'red',
+    completed: 'blue',
+    cancelled: 'gray',
+}
 
 const Sessions = () => {
     const [sessions, setSessions] = useState([])
@@ -16,14 +23,15 @@ const Sessions = () => {
 
     const fetchSessions = useCallback(async () => {
         try {
-            const res = await axios.post('/api/v1/user/get-sessions', { userId: user._id }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            })
+            const res = await axios.post(
+                '/api/v1/user/get-sessions',
+                { userId: user._id },
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+            )
             if (res.data.success) {
                 setSessions(res.data.data)
             }
         } catch (error) {
-            console.log(error)
             message.error('Failed to fetch sessions')
         } finally {
             setLoading(false)
@@ -36,16 +44,13 @@ const Sessions = () => {
         }
     }, [fetchSessions, user?._id])
 
-
     const handleUpdateSession = async (sessionId, status, link = '') => {
         try {
-            const res = await axios.put('/api/v1/user/sessions', {
-                sessionId,
-                status,
-                meetingLink: link
-            }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            })
+            const res = await axios.put(
+                '/api/v1/user/sessions',
+                { sessionId, status, meetingLink: link },
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+            )
             if (res.data.success) {
                 message.success('Session updated successfully')
                 fetchSessions()
@@ -65,9 +70,10 @@ const Sessions = () => {
             cancelText: 'Cancel',
             onOk: async () => {
                 try {
-                    const res = await axios.delete(`/api/v1/user/sessions/${sessionId}`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                    })
+                    const res = await axios.delete(
+                        `/api/v1/user/sessions/${sessionId}`,
+                        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+                    )
                     if (res.data.success) {
                         message.success('Session deleted successfully')
                         fetchSessions()
@@ -79,41 +85,29 @@ const Sessions = () => {
         })
     }
 
-    const getStatusColor = (status) => {
-        const colors = {
-            pending: 'orange',
-            accepted: 'green',
-            rejected: 'red',
-            completed: 'blue',
-            cancelled: 'gray'
-        }
-        return colors[status] || 'default'
-    }
-
     const columns = [
-        {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
-        },
+        { title: 'Title', dataIndex: 'title', key: 'title' },
         {
             title: user?.isMentor ? 'Mentee' : 'Mentor',
             key: 'other',
-            render: (_, record) => (
-                user?.isMentor ? record.menteeId?.name : record.mentorId?.name
-            ),
+            render: (_, record) =>
+                user?.isMentor ? record.menteeId?.name : record.mentorId?.name,
         },
         {
             title: 'Date',
             dataIndex: 'scheduledDate',
             key: 'scheduledDate',
-            render: (date) => new Date(date).toLocaleString(),
+            render: date => new Date(date).toLocaleString(),
         },
         {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            render: (status) => <Tag color={getStatusColor(status)}>{status.toUpperCase()}</Tag>,
+            render: status => (
+                <Tag color={STATUS_COLORS[status] || 'default'}>
+                    {status.toUpperCase()}
+                </Tag>
+            ),
         },
         {
             title: 'Actions',
@@ -129,8 +123,7 @@ const Sessions = () => {
                                     setSelectedSession(record)
                                     setIsModalVisible(true)
                                 }}
-                                className="session-action-btn"
-                                style={{ marginRight: '8px' }}
+                                style={{ marginRight: 8 }}
                             >
                                 ✓ Accept
                             </Button>
@@ -138,7 +131,6 @@ const Sessions = () => {
                                 danger
                                 size="small"
                                 onClick={() => handleUpdateSession(record._id, 'rejected')}
-                                className="session-action-btn"
                             >
                                 ✗ Reject
                             </Button>
@@ -157,14 +149,12 @@ const Sessions = () => {
                         </a>
                     )
                 }
-                // Allow both mentors and mentees to delete rejected sessions
                 if (record.status === 'rejected') {
                     return (
                         <Button
                             danger
                             size="small"
                             onClick={() => handleDeleteSession(record._id)}
-                            className="session-action-btn"
                         >
                             🗑️ Delete
                         </Button>
@@ -181,59 +171,34 @@ const Sessions = () => {
                 <h2 className="sessions-title">📅 My Sessions</h2>
                 <p className="sessions-subtitle">Manage your mentorship sessions</p>
             </div>
-            <div className="session-table">
-                <Table
-                    columns={columns}
-                    dataSource={sessions}
-                    loading={loading}
-                    rowKey="_id"
-                    pagination={{ pageSize: 10 }}
-                />
-            </div>
+
+            <Table
+                columns={columns}
+                dataSource={sessions}
+                loading={loading}
+                rowKey="_id"
+                pagination={{ pageSize: 10 }}
+            />
+
             <Modal
-                title={
-                    <span style={{
-                        background: 'linear-gradient(135deg, #DC143C 0%, #B71C1C 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                        fontWeight: 700
-                    }}>
-                        Accept Session
-                    </span>
-                }
+                title="Accept Session"
                 open={isModalVisible}
-                onOk={() => {
-                    if (meetingLink) {
-                        handleUpdateSession(selectedSession?._id, 'accepted', meetingLink)
-                    } else {
-                        message.warning('Please enter a meeting link')
-                    }
-                }}
+                onOk={() =>
+                    meetingLink
+                        ? handleUpdateSession(selectedSession?._id, 'accepted', meetingLink)
+                        : message.warning('Please enter a meeting link')
+                }
                 onCancel={() => {
                     setIsModalVisible(false)
                     setMeetingLink('')
                 }}
                 okText="Accept"
                 cancelText="Cancel"
-                okButtonProps={{
-                    style: {
-                        background: 'linear-gradient(135deg, #DC143C 0%, #B71C1C 100%)',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontWeight: 600
-                    }
-                }}
             >
                 <Input
                     placeholder="Enter meeting link (Zoom, Google Meet, etc.)"
                     value={meetingLink}
-                    onChange={(e) => setMeetingLink(e.target.value)}
-                    style={{
-                        borderRadius: '8px',
-                        padding: '10px 16px',
-                        marginTop: '10px'
-                    }}
+                    onChange={e => setMeetingLink(e.target.value)}
                 />
             </Modal>
         </Layout>
