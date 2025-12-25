@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import '../styles/Layout.css'
 import { adminMenu, mentorMenu, menteeMenu } from '../data/data'
-import { message, Badge, Alert, Avatar } from 'antd'
+import { message, Badge, Alert, Avatar, Switch } from 'antd'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { getProfilePicture } from '../utils/profilePicture'
@@ -10,6 +10,17 @@ const Layout = ({ children }) => {
     const { user } = useSelector(state => state.user)
     const location = useLocation()
     const navigate = useNavigate()
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light')
+
+    // Apply theme to body
+    useEffect(() => {
+        document.body.setAttribute('data-theme', theme)
+        localStorage.setItem('theme', theme)
+    }, [theme])
+
+    const toggleTheme = () => {
+        setTheme(prev => prev === 'light' ? 'dark' : 'light')
+    }
     
     let SliderBarMenu = menteeMenu
     if (user?.isAdmin) {
@@ -53,7 +64,15 @@ const Layout = ({ children }) => {
 
                     <div className='content'>
                         <div className='header'>
-                            <div className='header-content' style={{ cursor: "pointer", display: 'flex', alignItems: 'center', gap: '15px' }}>
+                            <div className='header-content' style={{ cursor: "pointer", display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                <div className="theme-toggle" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <i className={`fa-solid ${theme === 'light' ? 'fa-sun' : 'fa-moon'}`} style={{ color: theme === 'light' ? '#FFB800' : '#DC143C' }}></i>
+                                    <Switch 
+                                        checked={theme === 'dark'} 
+                                        onChange={toggleTheme}
+                                        size="small"
+                                    />
+                                </div>
                                 <Badge count={user?.notifcation?.length || 0} onClick={() => {
                                     navigate('/notification')
                                 }}>

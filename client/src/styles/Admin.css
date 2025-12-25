@@ -16,15 +16,15 @@
 }
 
 .admin-page-subtitle {
-    color: #6C757D;
+    color: var(--text-secondary);
     font-size: 1.1rem;
 }
 
 .admin-table {
-    background: white;
+    background: var(--card-bg);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px var(--shadow-color);
     border: 2px solid rgba(220, 20, 60, 0.1);
 }
 

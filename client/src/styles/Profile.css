@@ -17,8 +17,9 @@
 
 .profile-card {
     border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px var(--shadow-color);
     border: 2px solid rgba(220, 20, 60, 0.1);
+    background: var(--card-bg);
     overflow: hidden;
     animation: fadeInUp 0.6s ease-out;
 }
@@ -54,7 +55,7 @@
 }
 
 .profile-descriptions .ant-descriptions-item-content {
-    color: #212529;
+    color: var(--text-primary);
     font-size: 1rem;
 }
 
@@ -65,7 +66,9 @@
 .profile-form .ant-input,
 .profile-form .ant-input-password {
     border-radius: 8px;
-    border: 2px solid #E0E0E0;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-primary);
     padding: 10px 16px;
     transition: all 0.3s ease;
 }

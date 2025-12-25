@@ -1,8 +1,9 @@
 .main {
     padding: 15px;
     height: 100vh;
-    background: linear-gradient(135deg, #F5F5F5 0%, #E8E8E8 100%);
+    background: var(--bg-main);
     min-height: 100vh;
+    transition: background var(--transition-normal);
 }
 
 .layout {
@@ -36,23 +37,25 @@
 .header {
     min-height: 80px;
     margin-bottom: 0;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    background: white;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    background: var(--bg-header);
     border-radius: 12px;
     padding: 0 24px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    transition: background var(--transition-normal);
 }
 
 .body {
     min-height: calc(100vh - 200px);
     margin-bottom: 0;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    background: white;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    background: var(--bg-content);
     border-radius: 12px;
     padding: 24px;
     overflow-y: auto;
+    transition: background var(--transition-normal);
 }
 
 .logo {

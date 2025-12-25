@@ -32,6 +32,30 @@
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
+
+    /* Theme Variables - Light Mode (Default) */
+    --bg-main: linear-gradient(135deg, #F5F5F5 0%, #E8E8E8 100%);
+    --bg-content: #FFFFFF;
+    --bg-header: #FFFFFF;
+    --border-color: #E0E0E0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --card-bg: #FFFFFF;
+    --table-row-hover: rgba(220, 20, 60, 0.05);
+}
+
+/* Dark Mode Variables */
+[data-theme='dark'] {
+    --bg-main: linear-gradient(135deg, #050505 0%, #121212 100%);
+    --bg-content: #1A1A1A;
+    --bg-header: #1A1A1A;
+    --text-primary: #F5F5F5;
+    --text-secondary: #B0B0B0;
+    --border-color: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --card-bg: #242424;
+    --light-gray: #2D2D2D;
+    --white: #1A1A1A;
+    --table-row-hover: rgba(220, 20, 60, 0.15);
 }
 
 /* Global Styles */
@@ -43,9 +67,10 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #F5F5F5 0%, #E8E8E8 100%);
+    background: var(--bg-main);
     color: var(--text-primary);
     line-height: 1.6;
+    transition: background var(--transition-normal), color var(--transition-normal);
 }
 
 /* Smooth Scrolling */
@@ -119,9 +144,15 @@ html {
 .card {
     border-radius: 12px !important;
     box-shadow: var(--shadow-md) !important;
-    border: none !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--card-bg) !important;
     transition: all var(--transition-normal) !important;
     overflow: hidden !important;
+    color: var(--text-primary) !important;
+}
+
+.ant-card-body {
+    color: var(--text-primary) !important;
 }
 
 .ant-card:hover,
@@ -147,6 +178,8 @@ html {
 .ant-table {
     border-radius: 12px !important;
     overflow: hidden !important;
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
 }
 
 .ant-table-thead > tr > th {
@@ -157,12 +190,21 @@ html {
     padding: 16px !important;
 }
 
+.ant-table-tbody > tr > td {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
 .ant-table-tbody > tr {
     transition: all var(--transition-fast) !important;
 }
 
+.ant-table-tbody > tr:hover > td {
+    background: var(--table-row-hover) !important;
+}
+
 .ant-table-tbody > tr:hover {
-    background: rgba(220, 20, 60, 0.05) !important;
     transform: scale(1.01) !important;
 }
 
@@ -177,18 +219,26 @@ html {
 /* Input Fields */
 .ant-input,
 .ant-input-password,
-.ant-picker {
+.ant-picker,
+.ant-select-selector {
     border-radius: 8px !important;
-    border: 2px solid #E0E0E0 !important;
+    border: 2px solid var(--border-color) !important;
     padding: 10px 16px !important;
     transition: all var(--transition-fast) !important;
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
 }
 
 .ant-input:focus,
 .ant-input-password:focus,
-.ant-picker:focus {
+.ant-picker:focus,
+.ant-select-focused .ant-select-selector {
     border-color: var(--primary-red) !important;
     box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1) !important;
+}
+
+.ant-input::placeholder {
+    color: var(--text-secondary) !important;
 }
 
 /* Forms */
@@ -201,6 +251,7 @@ html {
 .ant-modal-content {
     border-radius: 16px !important;
     overflow: hidden !important;
+    background: var(--card-bg) !important;
 }
 
 .ant-modal-header {
@@ -212,6 +263,14 @@ html {
 .ant-modal-title {
     color: white !important;
     font-weight: 600 !important;
+}
+
+.ant-modal-close {
+    color: white !important;
+}
+
+.ant-modal-body {
+    color: var(--text-primary) !important;
 }
 
 /* Alerts/Notifications */
