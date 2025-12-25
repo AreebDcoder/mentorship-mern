@@ -29,6 +29,7 @@ const {
     joinWorkshopController,
     getUserWorkshopsController,
 } = require("../controllers/workshopCtrl");
+const { submitFeedbackController } = require("../controllers/feedbackCtrl");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 //router object
@@ -97,5 +98,8 @@ router.post("/workshops", authMiddleware, createWorkshopController);
 router.get("/workshops", authMiddleware, getAllWorkshopsController);
 router.post("/join-workshop", authMiddleware, joinWorkshopController);
 router.get("/user-workshops", authMiddleware, getUserWorkshopsController);
+
+// Feedback || POST
+router.post("/submit-feedback", authMiddleware, submitFeedbackController);
 
 module.exports = router;

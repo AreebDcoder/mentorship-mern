@@ -19,6 +19,8 @@ import RequestSession from './pages/RequestSession';
 import PostOpportunity from './pages/PostOpportunity';
 import Profile from './pages/Profile';
 import Workshops from './pages/Workshops';
+import Feedback from './pages/Feedback';
+import FeedbackQueue from './pages/admin/FeedbackQueue';
 
 function App() {
   const { loading } = useSelector(state => state.alerts)
@@ -100,6 +102,14 @@ function App() {
               }
             />
             <Route
+              path="/feedback"
+              element={
+                <ProtectedRoute>
+                  <Feedback />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/users"
               element={
                 <ProtectedRoute>
@@ -112,6 +122,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Mentors />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/feedback"
+              element={
+                <ProtectedRoute>
+                  <FeedbackQueue />
                 </ProtectedRoute>
               }
             />

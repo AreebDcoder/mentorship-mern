@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Layout from '../../components/Layout'
 import { Card, Row, Col, Statistic, message } from 'antd'
-import { UserOutlined, UserAddOutlined, CalendarOutlined, MessageOutlined, ShoppingOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import { UserOutlined, UserAddOutlined, CalendarOutlined, MessageOutlined, ShoppingOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons'
 import axios from 'axios'
 
 const Dashboard = () => {
@@ -116,8 +116,20 @@ const Dashboard = () => {
                                 valueStyle={{ color: '#eb2f96' }}
                             />
                         </Card>
-                    </Col>
-                </Row>
+                    </Col>                    <Col xs={24} sm={12} lg={6}>
+                        <Card 
+                            hoverable 
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => window.location.href = '/admin/feedback'}
+                        >
+                            <Statistic
+                                title="Pending Feedback"
+                                value={stats.pendingFeedback}
+                                prefix={<WarningOutlined />}
+                                valueStyle={{ color: '#cf1322' }}
+                            />
+                        </Card>
+                    </Col>                </Row>
             ) : (
                 <div className='text-center'>No data available</div>
             )}

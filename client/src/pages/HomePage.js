@@ -175,11 +175,18 @@ const HomePage = () => {
                             delay={0.4}
                         />
                         <DashboardCard
+                            icon="�"
+                            title="Feedback"
+                            description="Report bugs or suggest new features to the admin"
+                            onClick={() => navigate('/feedback')}
+                            delay={0.5}
+                        />
+                        <DashboardCard
                             icon="👤"
                             title="My Profile"
                             description="Update your profile, skills, and experience"
                             onClick={() => navigate('/profile')}
-                            delay={0.5}
+                            delay={0.6}
                         />
                     </Row>
                 ) : (
@@ -219,6 +226,13 @@ const HomePage = () => {
                             description="Join group learning sessions hosted by mentors"
                             onClick={() => navigate('/workshops')}
                             delay={0.5}
+                        />
+                        <DashboardCard
+                            icon="💬"
+                            title="Feedback"
+                            description="Report bugs or suggest new features to the admin"
+                            onClick={() => navigate('/feedback')}
+                            delay={0.6}
                         />
                     </Row>
                 )}

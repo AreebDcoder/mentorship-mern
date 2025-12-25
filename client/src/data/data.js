@@ -30,6 +30,11 @@ export const menteeMenu = [
         icon: 'fa-solid fa-chalkboard-user'
     },
     {
+        name: 'Feedback',
+        path: '/feedback',
+        icon: 'fa-solid fa-comment-dots'
+    },
+    {
         name: 'Profile',
         path: '/profile',
         icon: 'fa-solid fa-user'
@@ -68,6 +73,11 @@ export const mentorMenu = [
         icon: 'fa-solid fa-chalkboard-user'
     },
     {
+        name: 'Feedback',
+        path: '/feedback',
+        icon: 'fa-solid fa-comment-dots'
+    },
+    {
         name: 'Profile',
         path: '/profile',
         icon: 'fa-solid fa-user'
@@ -89,6 +99,11 @@ export const adminMenu = [
         name: 'Users',
         path: '/admin/users',
         icon: 'fa-solid fa-users'
+    },
+    {
+        name: 'Feedback Queue',
+        path: '/admin/feedback',
+        icon: 'fa-solid fa-comment-dots'
     },
     {
         name: 'Profile',

@@ -7,6 +7,10 @@ const {
     getDashboardStatsController,
     deleteMentorController,
 } = require("../controllers/adminCtrl");
+const {
+    getAllFeedbackController,
+    updateFeedbackStatusController,
+} = require("../controllers/feedbackCtrl");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
@@ -27,5 +31,9 @@ router.put("/approve-mentor-by-user", authMiddleware, approveMentorByUserIdContr
 router.get("/dashboard-stats", authMiddleware, getDashboardStatsController);
 //DELETE MENTOR
 router.delete('/mentors/:mentorId', authMiddleware, deleteMentorController);
+
+//FEEDBACK MANAGEMENT
+router.get("/getAllFeedback", authMiddleware, getAllFeedbackController);
+router.put("/updateFeedbackStatus", authMiddleware, updateFeedbackStatusController);
 
 module.exports = router;

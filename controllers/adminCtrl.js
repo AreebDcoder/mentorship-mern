@@ -4,6 +4,7 @@ const sessionModel = require("../models/sessionModel");
 const messageModel = require("../models/messageModel");
 const opportunityModel = require("../models/opportunityModel");
 const ratingModel = require("../models/ratingModel");
+const feedbackModel = require("../models/feedbackModel");
 
 const getAllUsersController = async (req, res) => {
     try {
@@ -210,6 +211,7 @@ const getDashboardStatsController = async (req, res) => {
         const completedSessions = await sessionModel.countDocuments({ status: "completed" });
         const totalOpportunities = await opportunityModel.countDocuments({ isActive: true });
         const totalMessages = await messageModel.countDocuments({});
+        const pendingFeedback = await feedbackModel.countDocuments({ status: "pending" });
 
         res.status(200).send({
             success: true,
@@ -222,6 +224,7 @@ const getDashboardStatsController = async (req, res) => {
                 completedSessions,
                 totalOpportunities,
                 totalMessages,
+                pendingFeedback,
             },
         });
     } catch (error) {
