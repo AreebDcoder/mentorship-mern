@@ -23,6 +23,12 @@ const {
     getFavoriteMentorsController,
     toggleFavoriteMentorController,
 } = require("../controllers/userCtrl");
+const {
+    createWorkshopController,
+    getAllWorkshopsController,
+    joinWorkshopController,
+    getUserWorkshopsController,
+} = require("../controllers/workshopCtrl");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 //router object
@@ -85,5 +91,11 @@ router.put("/update-profile", authMiddleware, updateProfileController);
 // Favorite mentors || GET/POST (toggle)
 router.get("/favorites", authMiddleware, getFavoriteMentorsController);
 router.post("/favorites/:mentorId", authMiddleware, toggleFavoriteMentorController);
+
+// Workshops || POST/GET
+router.post("/workshops", authMiddleware, createWorkshopController);
+router.get("/workshops", authMiddleware, getAllWorkshopsController);
+router.post("/join-workshop", authMiddleware, joinWorkshopController);
+router.get("/user-workshops", authMiddleware, getUserWorkshopsController);
 
 module.exports = router;
