@@ -208,7 +208,7 @@ const Profile = () => {
                                         {user?.role?.toUpperCase() || 'MENTEE'}
                                     </Tag>
                                 </Descriptions.Item>
-                                {user?.isMentor && (
+                                {user?.mentorStatus && (
                                     <Descriptions.Item label="Mentor Status">
                                         <Tag color={
                                             user?.mentorStatus === 'approved' ? 'green' :

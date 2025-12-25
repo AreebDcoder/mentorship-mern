@@ -128,7 +128,7 @@ const Users = () => {
                 
                 return (
                     <div className='d-flex gap-2'>
-                        {record.role === 'mentor' && record.mentorStatus === 'pending' && (
+                        {record.mentorStatus === 'pending' && (
                             <>
                                 <Button
                                     type="primary"
@@ -163,7 +163,7 @@ const Users = () => {
                                 </Button>
                             </>
                         )}
-                        {record.role === 'mentor' && record.mentorStatus === 'approved' && (
+                        {record.mentorStatus === 'approved' && (
                             <Button
                                 danger
                                 size="small"
@@ -178,7 +178,7 @@ const Users = () => {
                                 ✗ Revoke
                             </Button>
                         )}
-                        {record.role === 'mentor' && record.mentorStatus === 'rejected' && (
+                        {record.mentorStatus === 'rejected' && (
                             <Button
                                 type="primary"
                                 size="small"

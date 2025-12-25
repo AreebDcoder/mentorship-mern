@@ -117,6 +117,24 @@ const Mentors = () => {
                             </Button>
                         </>
                     )}
+                    {record.status === 'approved' && (
+                        <Button
+                            danger
+                            size="small"
+                            onClick={() => handleApprove(record._id, 'rejected')}
+                        >
+                            Revoke
+                        </Button>
+                    )}
+                    {record.status === 'rejected' && (
+                        <Button
+                            type="primary"
+                            size="small"
+                            onClick={() => handleApprove(record._id, 'approved')}
+                        >
+                            Approve
+                        </Button>
+                    )}
                 </div>
             ),
         },

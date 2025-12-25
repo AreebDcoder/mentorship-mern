@@ -14,8 +14,8 @@ const Layout = ({ children }) => {
     let SliderBarMenu = menteeMenu
     if (user?.isAdmin) {
         SliderBarMenu = adminMenu
-    } else if (user?.isMentor || user?.role === 'mentor') {
-        // Show mentor menu for all mentors (pending or approved)
+    } else if ((user?.isMentor || user?.role === 'mentor') && user?.mentorStatus !== 'rejected') {
+        // Show mentor menu for pending or approved mentors, but not rejected/revoked
         SliderBarMenu = mentorMenu
     }
     const handleLogout = () => {

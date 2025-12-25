@@ -18,6 +18,7 @@ import Opportunities from './pages/Opportunities';
 import RequestSession from './pages/RequestSession';
 import PostOpportunity from './pages/PostOpportunity';
 import Profile from './pages/Profile';
+import Workshops from './pages/Workshops';
 
 function App() {
   const { loading } = useSelector(state => state.alerts)
@@ -87,6 +88,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PostOpportunity />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/workshops"
+              element={
+                <ProtectedRoute>
+                  <Workshops />
                 </ProtectedRoute>
               }
             />

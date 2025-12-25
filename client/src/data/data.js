@@ -25,6 +25,11 @@ export const menteeMenu = [
         icon: 'fa-solid fa-briefcase'
     },
     {
+        name: 'Workshops',
+        path: '/workshops',
+        icon: 'fa-solid fa-chalkboard-user'
+    },
+    {
         name: 'Profile',
         path: '/profile',
         icon: 'fa-solid fa-user'
@@ -56,6 +61,11 @@ export const mentorMenu = [
         name: 'All Opportunities',
         path: '/opportunities',
         icon: 'fa-solid fa-briefcase'
+    },
+    {
+        name: 'Workshops',
+        path: '/workshops',
+        icon: 'fa-solid fa-chalkboard-user'
     },
     {
         name: 'Profile',

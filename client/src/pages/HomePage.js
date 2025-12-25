@@ -12,7 +12,7 @@ const HomePage = () => {
     
     const getUserData = async () => {
         try {
-            const res = await axios.post('/api/v1/user/getUserData', {},
+            await axios.post('/api/v1/user/getUserData', {},
                 {
                     headers: {
                         Authorization: "Bearer " + localStorage.getItem('token')
@@ -99,7 +99,7 @@ const HomePage = () => {
                     <p className="welcome-subtitle">
                         {user?.isAdmin 
                             ? 'Manage and monitor the SkillConnect platform'
-                            : (user?.role === 'mentor' || user?.isMentor)
+                            : (user?.role === 'mentor' || user?.isMentor) && user?.mentorStatus !== 'rejected'
                             ? 'Help students grow and share your expertise'
                             : 'Connect with mentors and accelerate your career growth'
                         }
@@ -144,7 +144,7 @@ const HomePage = () => {
                             </Card>
                         </Col>
                     </Row>
-                ) : (user?.role === 'mentor' || user?.isMentor) ? (
+                ) : (user?.role === 'mentor' || user?.isMentor) && user?.mentorStatus !== 'rejected' ? (
                     <Row gutter={[24, 24]}>
                         <DashboardCard
                             icon="📅"
@@ -168,11 +168,18 @@ const HomePage = () => {
                             delay={0.3}
                         />
                         <DashboardCard
+                            icon="🏫"
+                            title="Workshops"
+                            description="Host group learning sessions for multiple mentees"
+                            onClick={() => navigate('/workshops')}
+                            delay={0.4}
+                        />
+                        <DashboardCard
                             icon="👤"
                             title="My Profile"
                             description="Update your profile, skills, and experience"
                             onClick={() => navigate('/profile')}
-                            delay={0.4}
+                            delay={0.5}
                         />
                     </Row>
                 ) : (
@@ -205,6 +212,13 @@ const HomePage = () => {
                             description="Explore job and internship opportunities"
                             onClick={() => navigate('/opportunities')}
                             delay={0.4}
+                        />
+                        <DashboardCard
+                            icon="🏫"
+                            title="Workshops"
+                            description="Join group learning sessions hosted by mentors"
+                            onClick={() => navigate('/workshops')}
+                            delay={0.5}
                         />
                     </Row>
                 )}
