@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Layout from '../components/Layout'
-import { Card, Rate, Tag, Button, message, Space, Avatar } from 'antd'
+import { Card, Rate, Button, message, Space, Avatar, Input, Select, Switch } from 'antd'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
@@ -10,12 +10,37 @@ import '../styles/Mentors.css'
 const Mentors = () => {
     const [mentors, setMentors] = useState([])
     const [loading, setLoading] = useState(true)
+    const [favoriteIds, setFavoriteIds] = useState([])
+    const [filters, setFilters] = useState({
+        search: '',
+        skills: '',
+        industry: '',
+        language: '',
+        tags: '',
+        showFavoritesOnly: false,
+    })
     const { user } = useSelector(state => state.user)
     const navigate = useNavigate()
 
     useEffect(() => {
+        fetchFavorites()
         fetchMentors()
     }, [])
+
+    const fetchFavorites = async () => {
+        try {
+            const res = await axios.get('/api/v1/user/favorites', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+            if (res.data.success) {
+                setFavoriteIds(res.data.data.ids || [])
+            }
+        } catch (error) {
+            console.error('Error fetching favorite mentors:', error)
+        }
+    }
 
     const fetchMentors = async () => {
         try {
@@ -28,7 +53,12 @@ const Mentors = () => {
                     'Pragma': 'no-cache'
                 },
                 params: {
-                    _t: new Date().getTime() // Add timestamp to prevent caching
+                    _t: new Date().getTime(), // Add timestamp to prevent caching
+                    search: filters.search || undefined,
+                    skills: filters.skills || undefined,
+                    industry: filters.industry || undefined,
+                    language: filters.language || undefined,
+                    tags: filters.tags || undefined,
                 }
             })
             console.log('Mentors API response:', res.data)
@@ -56,6 +86,41 @@ const Mentors = () => {
         // Navigate to messages page and start conversation with this mentor
         navigate(`/messages?userId=${mentorUserId}`)
     }
+
+    const handleToggleFavorite = async (mentorId) => {
+        try {
+            const res = await axios.post(`/api/v1/user/favorites/${mentorId}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+
+            if (res.data.success) {
+                setFavoriteIds(res.data.data.ids || [])
+                message.success(res.data.message)
+            } else {
+                message.error(res.data.message || 'Failed to update favorites')
+            }
+        } catch (error) {
+            console.error('Error toggling favorite mentor:', error)
+            message.error('Failed to update favorites')
+        }
+    }
+
+    const filteredMentors = useMemo(() => {
+        if (!filters.showFavoritesOnly) return mentors
+        if (!favoriteIds.length) return []
+        const favSet = new Set(favoriteIds)
+        return mentors.filter(m => favSet.has(m._id))
+    }, [mentors, favoriteIds, filters.showFavoritesOnly])
+
+    const recommendedMentors = useMemo(() => {
+        if (!mentors.length) return []
+        // Take top 3 mentors by rating (already sorted server-side), excluding those not having a user
+        return mentors
+            .filter(m => m.userId)
+            .slice(0, 3)
+    }, [mentors])
 
     return (
         <Layout>
@@ -88,6 +153,112 @@ const Mentors = () => {
                         🔄 Refresh
                     </Button>
                 </div>
+
+                <div className="mentors-filters" style={{ marginBottom: '24px', display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                    <Input.Search
+                        placeholder="Search by name, skills, company..."
+                        allowClear
+                        value={filters.search}
+                        onChange={e => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                        onSearch={fetchMentors}
+                        style={{ maxWidth: 260 }}
+                    />
+                    <Input
+                        placeholder="Skills (comma-separated)"
+                        allowClear
+                        value={filters.skills}
+                        onChange={e => setFilters(prev => ({ ...prev, skills: e.target.value }))}
+                        style={{ maxWidth: 220 }}
+                    />
+                    <Input
+                        placeholder="Industry"
+                        allowClear
+                        value={filters.industry}
+                        onChange={e => setFilters(prev => ({ ...prev, industry: e.target.value }))}
+                        style={{ maxWidth: 180 }}
+                    />
+                    <Input
+                        placeholder="Language"
+                        allowClear
+                        value={filters.language}
+                        onChange={e => setFilters(prev => ({ ...prev, language: e.target.value }))}
+                        style={{ maxWidth: 180 }}
+                    />
+                    <Input
+                        placeholder="Tags (comma-separated)"
+                        allowClear
+                        value={filters.tags}
+                        onChange={e => setFilters(prev => ({ ...prev, tags: e.target.value }))}
+                        style={{ maxWidth: 220 }}
+                    />
+                    <Button onClick={fetchMentors}>
+                        Apply Filters
+                    </Button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Switch
+                            checked={filters.showFavoritesOnly}
+                            onChange={(checked) => setFilters(prev => ({ ...prev, showFavoritesOnly: checked }))}
+                        />
+                        <span style={{ color: '#6C757D' }}>Show favorites only</span>
+                    </div>
+                </div>
+
+                {recommendedMentors.length > 0 && (
+                    <div style={{ marginBottom: '24px' }}>
+                        <h3 style={{ marginBottom: '12px', color: '#212529' }}>
+                            ⭐ You might like these mentors
+                        </h3>
+                        <div className="row" style={{ margin: '0 -12px' }}>
+                            {recommendedMentors.map((mentor, index) => (
+                                <div
+                                    key={mentor._id}
+                                    className='col-md-4 mb-3'
+                                    style={{ padding: '0 12px', animation: `fadeInUp 0.6s ease-out ${index * 0.05}s both` }}
+                                >
+                                    <Card
+                                        className="mentor-card"
+                                        hoverable
+                                        style={{ borderRadius: '16px' }}
+                                        headStyle={{
+                                            background: 'linear-gradient(135deg, #FFB800 0%, #FF8C00 100%)',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '16px',
+                                        }}
+                                        bodyStyle={{ padding: '18px' }}
+                                        title={
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <span style={{ fontWeight: 700 }}>
+                                                    {mentor.userId?.name || 'Mentor'}
+                                                </span>
+                                                <Rate disabled value={mentor.rating || 0} style={{ color: '#DC143C', fontSize: '1rem' }} />
+                                            </div>
+                                        }
+                                    >
+                                        <p style={{ marginBottom: 8, color: '#6C757D' }}>{mentor.experience}</p>
+                                        {mentor.skills && mentor.skills.length > 0 && (
+                                            <div style={{ marginBottom: 8 }}>
+                                                {mentor.skills.slice(0, 3).map((skill, idx) => (
+                                                    <span key={idx} className="skill-tag">{skill}</span>
+                                                ))}
+                                                {mentor.skills.length > 3 && (
+                                                    <span className="skill-tag">+{mentor.skills.length - 3} more</span>
+                                                )}
+                                            </div>
+                                        )}
+                                        <Button
+                                            type="link"
+                                            onClick={() => handleRequestSession(mentor._id)}
+                                            style={{ padding: 0 }}
+                                        >
+                                            View details & request session
+                                        </Button>
+                                    </Card>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 {loading ? (
                     <div className='text-center' style={{ padding: '60px 0' }}>
                         <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
@@ -95,7 +266,7 @@ const Mentors = () => {
                         </div>
                         <p style={{ marginTop: '20px', color: '#6C757D' }}>Loading mentors...</p>
                     </div>
-                ) : mentors.length === 0 ? (
+                ) : filteredMentors.length === 0 ? (
                     <div className="empty-state">
                         <div className="empty-state-icon">🔍</div>
                         <h3 style={{ color: '#6C757D', marginBottom: '10px', fontSize: '1.5rem' }}>No mentors available</h3>
@@ -118,7 +289,7 @@ const Mentors = () => {
                     </div>
                 ) : (
                     <div className='row' style={{ margin: '0 -12px' }}>
-                        {mentors.map((mentor, index) => (
+                        {filteredMentors.map((mentor, index) => (
                             <div 
                                 key={mentor._id} 
                                 className='col-md-4 mb-4' 
@@ -168,6 +339,18 @@ const Mentors = () => {
                                         </div>
                                     }
                                 >
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
+                                        <Button
+                                            type="text"
+                                            size="small"
+                                            onClick={() => handleToggleFavorite(mentor._id)}
+                                            style={{ padding: '0 4px' }}
+                                        >
+                                            <span style={{ fontSize: '1.3rem' }}>
+                                                {favoriteIds.includes(mentor._id) ? '❤️' : '🤍'}
+                                            </span>
+                                        </Button>
+                                    </div>
                                     <div style={{ marginBottom: '20px' }}>
                                         <strong style={{ color: '#DC143C', fontSize: '1rem', display: 'block', marginBottom: '8px' }}>
                                             💼 Experience:

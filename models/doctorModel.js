@@ -10,6 +10,15 @@ const mentorProfileSchema = new mongoose.Schema(
         skills: [{
             type: String,
         }],
+        industry: {
+            type: String,
+        },
+        languages: [{
+            type: String,
+        }],
+        tags: [{
+            type: String,
+        }],
         experience: {
             type: String,
             required: [true, "experience is required"],

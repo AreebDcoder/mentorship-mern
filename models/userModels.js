@@ -50,6 +50,11 @@ const userSchema = new mongoose.Schema({
         type: Array,
         default: [],
     },
+    favoriteMentors: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "mentorProfiles",
+        default: [],
+    }],
 }, { timestamps: true });
 
 const userModel = mongoose.model("users", userSchema);

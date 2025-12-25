@@ -190,6 +190,9 @@ const applyMentorController = async (req, res) => {
                 mentorProfile._id,
                 {
                     skills: req.body.skills || mentorProfile.skills,
+                    industry: req.body.industry || mentorProfile.industry,
+                    languages: req.body.languages || mentorProfile.languages,
+                    tags: req.body.tags || mentorProfile.tags,
                     experience: req.body.experience || mentorProfile.experience,
                     availability: req.body.availability || mentorProfile.availability,
                     bio: req.body.bio || mentorProfile.bio,
@@ -206,6 +209,9 @@ const applyMentorController = async (req, res) => {
             mentorProfile = new mentorProfileModel({
                 userId,
                 skills: req.body.skills || [],
+                industry: req.body.industry || "",
+                languages: req.body.languages || [],
+                tags: req.body.tags || [],
                 experience: req.body.experience || "",
                 availability: req.body.availability || {},
                 bio: req.body.bio || "",
@@ -249,10 +255,47 @@ const applyMentorController = async (req, res) => {
     }
 };
 
-// Get all mentors
+// Get all mentors (with optional filters)
 const getAllMentorsController = async (req, res) => {
     try {
         console.log("\n=== GET ALL MENTORS REQUEST ===");
+
+        const { search, skills, industry, language, tags } = req.query || {};
+
+        // Build base query for approved mentors
+        const query = { status: "approved" };
+
+        // Skills filter (comma-separated list, matches any)
+        if (skills) {
+            const skillsArray = skills
+                .split(",")
+                .map(s => s.trim())
+                .filter(Boolean);
+            if (skillsArray.length) {
+                query.skills = { $in: skillsArray };
+            }
+        }
+
+        // Industry filter (exact match, case-insensitive)
+        if (industry) {
+            query.industry = { $regex: new RegExp(industry, "i") };
+        }
+
+        // Language filter (matches any language in array, case-insensitive)
+        if (language) {
+            query.languages = { $elemMatch: { $regex: new RegExp(language, "i") } };
+        }
+
+        // Tags filter (comma-separated, matches any tag)
+        if (tags) {
+            const tagsArray = tags
+                .split(",")
+                .map(t => t.trim())
+                .filter(Boolean);
+            if (tagsArray.length) {
+                query.tags = { $in: tagsArray };
+            }
+        }
 
         // First, let's check all mentor profiles to debug
         const allProfiles = await mentorProfileModel.find({}).select("_id userId status");
@@ -265,9 +308,9 @@ const getAllMentorsController = async (req, res) => {
         const approvedCount = await mentorProfileModel.countDocuments({ status: "approved" });
         console.log(`Mentor profiles with status "approved": ${approvedCount}`);
 
-        // Get all approved mentor profiles
+        // Get all approved mentor profiles (with filters)
         const allApprovedProfiles = await mentorProfileModel
-            .find({ status: "approved" })
+            .find(query)
             .populate({
                 path: "userId",
                 select: "name email profile isAdmin",
@@ -1072,6 +1115,94 @@ const updateProfileController = async (req, res) => {
     }
 };
 
+// Favorite mentors controllers
+const getFavoriteMentorsController = async (req, res) => {
+    try {
+        const user = await userModel
+            .findById(req.body.userId)
+            .populate({
+                path: "favoriteMentors",
+                populate: {
+                    path: "userId",
+                    select: "name email profile isAdmin",
+                },
+            });
+
+        if (!user) {
+            return res.status(404).send({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        const favorites = user.favoriteMentors || [];
+        res.status(200).send({
+            success: true,
+            data: {
+                mentors: favorites,
+                ids: favorites.map(m => m._id?.toString()),
+            },
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: "Error fetching favorite mentors",
+            error,
+        });
+    }
+};
+
+const toggleFavoriteMentorController = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const { mentorId } = req.params;
+
+        const user = await userModel.findById(userId);
+        if (!user) {
+            return res.status(404).send({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        const mentorProfile = await mentorProfileModel.findById(mentorId);
+        if (!mentorProfile || mentorProfile.status !== "approved") {
+            return res.status(404).send({
+                success: false,
+                message: "Mentor profile not found or not approved",
+            });
+        }
+
+        const favorites = user.favoriteMentors || [];
+        const mentorIdStr = mentorId.toString();
+        const exists = favorites.some(id => id.toString() === mentorIdStr);
+
+        if (exists) {
+            user.favoriteMentors = favorites.filter(id => id.toString() !== mentorIdStr);
+        } else {
+            user.favoriteMentors.push(mentorProfile._id);
+        }
+
+        await user.save();
+
+        res.status(200).send({
+            success: true,
+            message: exists ? "Mentor removed from favorites" : "Mentor added to favorites",
+            data: {
+                ids: user.favoriteMentors.map(id => id.toString()),
+            },
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: "Error updating favorite mentors",
+            error,
+        });
+    }
+};
+
 module.exports = {
     loginController,
     registerController,
@@ -1093,4 +1224,6 @@ module.exports = {
     deleteOpportunityController,
     submitRatingController,
     updateProfileController,
+    getFavoriteMentorsController,
+    toggleFavoriteMentorController,
 };

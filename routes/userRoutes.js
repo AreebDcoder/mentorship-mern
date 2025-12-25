@@ -20,6 +20,8 @@ const {
     deleteOpportunityController,
     submitRatingController,
     updateProfileController,
+    getFavoriteMentorsController,
+    toggleFavoriteMentorController,
 } = require("../controllers/userCtrl");
 const authMiddleware = require("../middlewares/authMiddleware");
 
@@ -79,5 +81,9 @@ router.post("/ratings", authMiddleware, submitRatingController);
 
 //Update Profile || PUT
 router.put("/update-profile", authMiddleware, updateProfileController);
+
+// Favorite mentors || GET/POST (toggle)
+router.get("/favorites", authMiddleware, getFavoriteMentorsController);
+router.post("/favorites/:mentorId", authMiddleware, toggleFavoriteMentorController);
 
 module.exports = router;

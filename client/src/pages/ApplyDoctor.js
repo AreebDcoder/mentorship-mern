@@ -25,6 +25,9 @@ const ApplyMentor = () => {
             
             const payload = {
                 skills: values.skills ? values.skills.split(',').map(s => s.trim()) : [],
+                industry: values.industry || '',
+                languages: values.languages ? values.languages.split(',').map(l => l.trim()) : [],
+                tags: values.tags ? values.tags.split(',').map(t => t.trim()) : [],
                 experience: values.experience,
                 availability: availability,
                 bio: values.bio,
@@ -98,8 +101,18 @@ const ApplyMentor = () => {
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={24} lg={12}>
+                        <Form.Item label='Industry' name='industry'>
+                            <Input placeholder='e.g., Software, Finance, Healthcare' />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={24} lg={12}>
                         <Form.Item label='Experience' name='experience' rules={[{ required: true }]}>
                             <Input placeholder='e.g., 5 years in Software Development' />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={24} lg={12}>
+                        <Form.Item label='Languages (comma-separated)' name='languages'>
+                            <Input placeholder='e.g., English, Spanish, French' />
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={24} lg={12}>
@@ -115,6 +128,11 @@ const ApplyMentor = () => {
                     <Col xs={24} md={24} lg={12}>
                         <Form.Item label='Graduation Year' name='graduationYear'>
                             <Input placeholder='e.g., 2020' />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={24} lg={24}>
+                        <Form.Item label='Tags (comma-separated)' name='tags'>
+                            <Input placeholder='e.g., Frontend, Backend, Career Coaching' />
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={24} lg={24}>
