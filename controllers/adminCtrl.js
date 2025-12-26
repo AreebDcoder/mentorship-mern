@@ -20,9 +20,33 @@ const getAllUsersController = async (req, res) => {
 
         console.log(`\n--- ADMIN USERS LIST FETCH ---`);
         console.log(`Found ${users.length} users matching criteria`);
-        users.forEach((u, i) => {
+
+        // Ensure we have consistent mentorStatus on user objects. Some older
+        // mentor records may have the role set to 'mentor' but not have
+        // `mentorStatus` stored on the user document. For the admin Users
+        // page we need mentorStatus to render action buttons correctly.
+        for (let i = 0; i < users.length; i++) {
+            const u = users[i];
+            if (!u.mentorStatus) {
+                // Try to find the mentor profile and derive the status from it
+                try {
+                    const profile = await mentorProfileModel.findOne({ userId: u._id }).select('status');
+                    if (profile && profile.status) {
+                        // Keep response consistent
+                        u.mentorStatus = profile.status;
+                        // Persist to user document so future calls are consistent
+                        try {
+                            await userModel.findByIdAndUpdate(u._id, { $set: { mentorStatus: profile.status, isMentor: profile.status === 'approved', role: profile.status === 'approved' ? 'mentor' : 'mentee' } });
+                        } catch (updErr) {
+                            console.warn('Failed to persist mentorStatus for user', u._id, updErr.message || updErr);
+                        }
+                    }
+                } catch (pfErr) {
+                    console.warn('Error fetching mentor profile for user', u._id, pfErr.message || pfErr);
+                }
+            }
             console.log(`[${i}] ${u.name} | Role: ${u.role} | Status: ${u.mentorStatus} | ID: ${u._id}`);
-        });
+        }
         console.log(`-------------------------------\n`);
 
         res.status(200).send({

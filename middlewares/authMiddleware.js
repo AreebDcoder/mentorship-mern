@@ -33,8 +33,13 @@ module.exports = async (req, res, next) => {
                 if (!req.body) {
                     req.body = {};
                 }
-                req.body.userId = decode.id;
-                // Also attach to req.user for easier access
+                // Do NOT overwrite a caller-supplied `userId` (admin endpoints
+                // pass the target user's id in the body). Only set `req.body.userId`
+                // when it's missing so existing controllers that expect it still work.
+                if (!req.body.userId) {
+                    req.body.userId = decode.id;
+                }
+                // Also attach to req.user for easier access to the authenticated id
                 req.user = { id: decode.id };
                 next();
             }
