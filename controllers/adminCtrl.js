@@ -1,5 +1,6 @@
 const mentorProfileModel = require("../models/doctorModel");
 const userModel = require("../models/userModels");
+const bcrypt = require("bcryptjs");
 const sessionModel = require("../models/sessionModel");
 const messageModel = require("../models/messageModel");
 const opportunityModel = require("../models/opportunityModel");
@@ -342,6 +343,225 @@ const deleteMentorController = async (req, res) => {
     }
 };
 
+const requireAdminUser = async (req, res) => {
+    try {
+        if (!req.user?.id) {
+            res.status(401).send({
+                success: false,
+                message: "Auth Failed - no user attached to token",
+            });
+            return null;
+        }
+        const adminUser = await userModel.findById(req.user.id).select("isAdmin");
+        if (!adminUser || !adminUser.isAdmin) {
+            res.status(403).send({
+                success: false,
+                message: "Admin access required",
+            });
+            return null;
+        }
+        return adminUser;
+    } catch (error) {
+        console.error("Error verifying admin user:", error);
+        res.status(500).send({
+            success: false,
+            message: "Failed to verify admin permissions",
+            error: error.message,
+        });
+        return null;
+    }
+};
+
+const createUserController = async (req, res) => {
+    try {
+        const adminUser = await requireAdminUser(req, res);
+        if (!adminUser) return;
+
+        const { name, email, password, role = "mentee" } = req.body;
+        if (!name || !email || !password) {
+            return res.status(400).send({
+                success: false,
+                message: "Name, email, and password are required to create a user",
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const existingUser = await userModel.findOne({ email: normalizedEmail });
+        if (existingUser) {
+            return res.status(400).send({
+                success: false,
+                message: "Email already in use",
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const profile = typeof req.body.profile === "object" ? req.body.profile : {};
+
+        const newUser = await userModel.create({
+            name: name.trim(),
+            email: normalizedEmail,
+            password: hashedPassword,
+            role,
+            isAdmin: role === "admin",
+            isMentor: role === "mentor",
+            mentorStatus: role === "mentor" ? (req.body.mentorStatus || "pending") : undefined,
+            profile,
+        });
+
+        newUser.password = undefined;
+        res.status(201).send({
+            success: true,
+            message: "User created successfully",
+            data: newUser,
+        });
+    } catch (error) {
+        console.error("Error creating user:", error);
+        res.status(500).send({
+            success: false,
+            message: "Error creating user",
+            error: error.message,
+        });
+    }
+};
+
+const updateUserController = async (req, res) => {
+    try {
+        const adminUser = await requireAdminUser(req, res);
+        if (!adminUser) return;
+
+        const { userId } = req.params;
+        if (!userId) {
+            return res.status(400).send({
+                success: false,
+                message: "User ID parameter is required",
+            });
+        }
+
+        const existingUser = await userModel.findById(userId);
+        if (!existingUser) {
+            return res.status(404).send({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        const updates = {};
+        if (req.body.name) updates.name = req.body.name.trim();
+        if (req.body.email) {
+            const normalizedEmail = req.body.email.trim().toLowerCase();
+            if (normalizedEmail !== existingUser.email) {
+                const duplicate = await userModel.findOne({ email: normalizedEmail });
+                if (duplicate && duplicate._id.toString() !== userId) {
+                    return res.status(400).send({
+                        success: false,
+                        message: "Another user is already using that email",
+                    });
+                }
+            }
+            updates.email = normalizedEmail;
+        }
+        if (req.body.password) {
+            updates.password = await bcrypt.hash(req.body.password, 10);
+        }
+        if (req.body.role) {
+            updates.role = req.body.role;
+            updates.isAdmin = req.body.role === "admin";
+            updates.isMentor = req.body.role === "mentor";
+            if (req.body.role !== "mentor") {
+                updates.mentorStatus = null;
+            } else if (!Object.prototype.hasOwnProperty.call(req.body, "mentorStatus") && !existingUser.mentorStatus) {
+                updates.mentorStatus = "pending";
+            }
+        }
+        if (Object.prototype.hasOwnProperty.call(req.body, "mentorStatus")) {
+            updates.mentorStatus = req.body.mentorStatus || null;
+        }
+        if (req.body.profile && typeof req.body.profile === "object") {
+            updates.profile = {
+                ...(existingUser.profile instanceof Object ? existingUser.profile : {}),
+                ...req.body.profile,
+            };
+        }
+
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).send({
+                success: false,
+                message: "No valid fields provided to update",
+            });
+        }
+
+        const updatedUser = await userModel.findByIdAndUpdate(userId, { $set: updates }, { new: true, runValidators: true });
+        if (!updatedUser) {
+            return res.status(404).send({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        updatedUser.password = undefined;
+        res.status(200).send({
+            success: true,
+            message: "User updated successfully",
+            data: updatedUser,
+        });
+    } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).send({
+            success: false,
+            message: "Error updating user",
+            error: error.message,
+        });
+    }
+};
+
+const deleteUserController = async (req, res) => {
+    try {
+        const adminUser = await requireAdminUser(req, res);
+        if (!adminUser) return;
+
+        const { userId } = req.params;
+        if (!userId) {
+            return res.status(400).send({
+                success: false,
+                message: "User ID parameter is required",
+            });
+        }
+
+        const userToDelete = await userModel.findById(userId);
+        if (!userToDelete) {
+            return res.status(404).send({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        if (userToDelete.isAdmin) {
+            const adminCount = await userModel.countDocuments({ isAdmin: true });
+            if (adminCount <= 1) {
+                return res.status(403).send({
+                    success: false,
+                    message: "Cannot delete the last admin",
+                });
+            }
+        }
+
+        await mentorProfileModel.deleteMany({ userId: userId });
+        await userModel.findByIdAndDelete(userId);
+
+        res.status(200).send({
+            success: true,
+            message: "User deleted successfully",
+        });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).send({
+            success: false,
+            message: "Error deleting user",
+            error: error.message,
+        });
+    }
+};
+
 
 module.exports = {
     getAllUsersController,
@@ -350,4 +570,7 @@ module.exports = {
     approveMentorByUserIdController,
     getDashboardStatsController,
     deleteMentorController,
+    createUserController,
+    updateUserController,
+    deleteUserController,
 };

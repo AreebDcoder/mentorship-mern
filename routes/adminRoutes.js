@@ -6,6 +6,9 @@ const {
     approveMentorByUserIdController,
     getDashboardStatsController,
     deleteMentorController,
+    createUserController,
+    updateUserController,
+    deleteUserController,
 } = require("../controllers/adminCtrl");
 const {
     getAllFeedbackController,
@@ -17,6 +20,11 @@ const router = express.Router();
 
 //GET METHOD || USERS
 router.get("/getAllUsers", authMiddleware, getAllUsersController);
+
+// CRUD for users
+router.post("/users", authMiddleware, createUserController);
+router.put("/users/:userId", authMiddleware, updateUserController);
+router.delete("/users/:userId", authMiddleware, deleteUserController);
 
 //GET METHOD || MENTORS
 router.get("/getAllMentors", authMiddleware, getAllMentorsController);
