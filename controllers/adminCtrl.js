@@ -9,14 +9,9 @@ const feedbackModel = require("../models/feedbackModel");
 
 const getAllUsersController = async (req, res) => {
     try {
-        // Only show MENTORS in the admin users list (for approval purposes)
-        // Mentees don't need approval, so they shouldn't appear here
+        // Show ALL non-admin users (both mentees and mentors) for admin management
         const users = await userModel.find({
-            isAdmin: { $ne: true },
-            $or: [
-                { role: "mentor" },
-                { mentorStatus: { $in: ["pending", "approved", "rejected"] } }
-            ]
+            isAdmin: { $ne: true }
         }).select("-password").sort({ updatedAt: -1 }).lean();
 
         console.log(`\n--- ADMIN USERS LIST FETCH ---`);
@@ -28,7 +23,7 @@ const getAllUsersController = async (req, res) => {
         // page we need mentorStatus to render action buttons correctly.
         for (let i = 0; i < users.length; i++) {
             const u = users[i];
-            if (!u.mentorStatus) {
+            if (!u.mentorStatus && u.role === "mentor") {
                 // Try to find the mentor profile and derive the status from it
                 try {
                     const profile = await mentorProfileModel.findOne({ userId: u._id }).select('status');
@@ -41,18 +36,21 @@ const getAllUsersController = async (req, res) => {
                         } catch (updErr) {
                             console.warn('Failed to persist mentorStatus for user', u._id, updErr.message || updErr);
                         }
+                    } else if (u.role === "mentor") {
+                        // If user is marked as mentor but has no profile, set status to pending
+                        u.mentorStatus = "pending";
                     }
                 } catch (pfErr) {
                     console.warn('Error fetching mentor profile for user', u._id, pfErr.message || pfErr);
                 }
             }
-            console.log(`[${i}] ${u.name} | Role: ${u.role} | Status: ${u.mentorStatus} | ID: ${u._id}`);
+            console.log(`[${i}] ${u.name} | Role: ${u.role} | Status: ${u.mentorStatus || 'N/A'} | ID: ${u._id}`);
         }
         console.log(`-------------------------------\n`);
 
         res.status(200).send({
             success: true,
-            message: "Mentor users list for approval",
+            message: "All users list for admin management",
             data: users,
         });
     } catch (error) {
